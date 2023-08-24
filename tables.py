@@ -3,9 +3,9 @@ import mysql.connector
 # Database configuration
 config = {
     'user': 'root',
-    'password': 'password',
+    'password': 'shreyas',
     'host': 'localhost',
-    'database': 'hospital_management'
+    'database': 'HMS_F'
 }
 
 # Connect to the MySQL server

@@ -1,5 +1,4 @@
 import mysql.connector
-from tables import setup_database  # Assuming tables.py contains a function named setup_database
 from AdminModule import AdminModule
 from DoctorModule import DoctorModule
 from PatientModule import PatientModule
@@ -7,10 +6,10 @@ from PharmacistModule import PharmacistModule
 from OtherStaffModule import OtherStaffModule
 
 config = {
-    'host': 'your_host',
-    'user': 'your_user',
-    'password': 'your_password',
-    'database': 'your_database'
+    'user': 'root',
+    'password': 'shreyas',
+    'host': 'localhost',
+    'database': 'HMS_F'
 }
 
 def login():
@@ -30,8 +29,6 @@ def login():
     return result[0] if result else None
 
 def main():
-    # Setup the database tables
-    setup_database(config)
     
     while True:
         user_role = login()

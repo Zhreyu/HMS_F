@@ -1,3 +1,4 @@
+import mysql.connector
 class PharmacistModule:
     def __init__(self, config):
         self.db = mysql.connector.connect(**config)
@@ -17,27 +18,63 @@ class PharmacistModule:
             print(f"Error: {err}")
             return None
 
-    def view_inventory(self):
+    def view_inventory():
         try:
-            # Your view_inventory code
+            cursor.execute("SELECT * FROM pharmacy")
+            inventory = cursor.fetchall()
+            if not inventory:
+                print("Inventory is empty.")
+                return
+
+            print("\nInventory:")
+            for item in inventory:
+                print(f"Medicine ID: {item[0]}, Name: {item[1]}, Quantity: {item[2]}, Price: {item[3]}")
         except Exception as e:
             print("An error occurred:", e)
 
     def update_inventory():
-        medicine_name = input("Enter medicine name: ")
-        quantity = int(input("Enter quantity to add/update: "))
-        price = float(input("Enter price: "))
-        try:
-            query = """
-            INSERT INTO pharmacy_inventory (medicine_name, quantity, price) 
-            VALUES (%s, %s, %s) 
-            ON DUPLICATE KEY UPDATE quantity=quantity+%s, price=%s
-            """
-            cursor.execute(query, (medicine_name, quantity, price, quantity, price))
-            db.commit()
-            print("Inventory updated successfully.")
-        except Exception as e:
-            print("An error occurred:", e)
+        medicine_id = input("Enter medicine ID (or 'new' if it's a new medicine): ")
+        
+        if medicine_id == 'new':
+            medicine_name = input("Enter new medicine name: ")
+            quantity = int(input("Enter quantity: "))
+            price = float(input("Enter price: "))
+            try:
+                query = "INSERT INTO pharmacy (name, quantity, price) VALUES (%s, %s, %s)"
+                cursor.execute(query, (medicine_name, quantity, price))
+                db.commit()
+                print("New medicine added to inventory.")
+            except Exception as e:
+                print("An error occurred:", e)
+        else:
+            medicine_name = input("Enter updated medicine name (or press enter to skip): ")
+            quantity = input("Enter quantity to add/update (or press enter to skip): ")
+            price = input("Enter updated price (or press enter to skip): ")
+            
+            query_parts = []
+            values = []
+
+            if medicine_name:
+                query_parts.append("name = %s")
+                values.append(medicine_name)
+            if quantity:
+                query_parts.append("quantity = quantity + %s")
+                values.append(int(quantity))
+            if price:
+                query_parts.append("price = %s")
+                values.append(float(price))
+
+            if query_parts:
+                try:
+                    query = f"UPDATE pharmacy SET {', '.join(query_parts)} WHERE id = %s"
+                    values.append(medicine_id)
+                    cursor.execute(query, values)
+                    db.commit()
+                    print("Medicine inventory updated successfully.")
+                except Exception as e:
+                    print("An error occurred:", e)
+            else:
+                print("No updates provided.")
 
     
     def view_salary_info(user_id):

@@ -1,55 +1,64 @@
-from AdminModule import AdminModule,admin_module
-from DoctorModule import DoctorModule,doctor_module
-from PatientModule import PatientModule,patient_module
-from PharmacistModule import PharmacistModule,pharmacist_module
-from OtherStaffModule import OtherStaffModule,other_staff_module
+import mysql.connector
+from tables import setup_database  # Assuming tables.py contains a function named setup_database
+from AdminModule import AdminModule
+from DoctorModule import DoctorModule
+from PatientModule import PatientModule
+from PharmacistModule import PharmacistModule
+from OtherStaffModule import OtherStaffModule
 
+config = {
+    'host': 'your_host',
+    'user': 'your_user',
+    'password': 'your_password',
+    'database': 'your_database'
+}
 
-
-def login(username, password):
-    query = "SELECT * FROM login_info WHERE username = %s AND password = %s"
-    result = execute_query(query, (username, password))
+def login():
+    db = mysql.connector.connect(**config)
+    cursor = db.cursor()
+    
+    username = input("Enter username: ")
+    password = input("Enter password: ")
+    
+    query = "SELECT role FROM login_info WHERE username = %s AND password = %s"
+    cursor.execute(query, (username, password))
+    result = cursor.fetchone()
+    
+    cursor.close()
+    db.close()
+    
     return result[0] if result else None
 
 def main():
-    print("################################")
-    print("Welcome to Hospital Management System (HMS)")
-    print("################################\n")
-
+    # Setup the database tables
+    setup_database(config)
+    
     while True:
-        print("1. Login")
-        print("2. Exit")
-        choice = input("Enter your choice: ")
-
-        if choice == "1":
-            username = input("Username: ")
-            password = input("Password: ")
-
-            user = login(username, password)
-            
-            if user:
-                role = user[3]
-                user_id = user[4]
-
-                if role == "doctor":
-                    doctor_module(user_id)
-                elif role == "patient":
-                    patient_module(user_id)
-                elif role == "pharmacist":
-                    pharmacist_module()
-                elif role == "admin":
-                    admin_module()
-                elif role == "other":
-                    other_staff_module(user_id)
-                else:
-                    print("Invalid role. Please contact the system administrator.")
-            else:
-                print("Login failed. Please try again.")
-        elif choice == "2":
-            print("Thank you for using HMS. Goodbye!")
-            break
+        user_role = login()
+        
+        if not user_role:
+            print("Invalid login. Please try again.")
+            continue
+        
+        if user_role == 'admin':
+            admin_module = AdminModule(config)
+            admin_module.admin_module()
+        elif user_role == 'doctor':
+            doctor_id = input("Enter your doctor ID: ")
+            doctor_module = DoctorModule(config, doctor_id)
+            doctor_module.doctor_module()
+        elif user_role == 'patient':
+            patient_id = input("Enter your patient ID: ")
+            patient_module = PatientModule(config)
+            patient_module.patient_module(patient_id)
+        elif user_role == 'pharmacist':
+            pharmacist_module = PharmacistModule(config)
+            pharmacist_module.pharmacist_module()
+        elif user_role == 'other':
+            other_staff_module = OtherStaffModule(config)
+            other_staff_module.other_staff_module()
         else:
-            print("Invalid choice. Please try again.")
+            print("Invalid role. Please try again.")
 
 if __name__ == "__main__":
     main()

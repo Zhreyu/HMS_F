@@ -19,8 +19,8 @@ class AdminModule:
             print(f"Error: {err}")
             return None
 
-    def add_employee(role):
-        if role == "doctor":
+    def add_employee(self,role):
+        if role == "D":
             doctor_id = input("Enter Doctor ID: ")
             name = input("Enter Doctor name: ")
             specialty = input("Enter specialty: ")
@@ -28,23 +28,23 @@ class AdminModule:
             leave_balance = 5
             query = "INSERT INTO doctors(id, name, specialty, salary, leave_balance) VALUES (%s, %s, %s, %s, %s)"
             values = (doctor_id, name, specialty, salary, leave_balance)
-            execute_query(query, values, fetch=False)
+            self.execute_query(query, values, fetch=False)
         
-        elif role == "patient":
+        elif role == "PT":
             patient_id = input("Enter patient ID: ")
             name = input("Enter patient name: ")
             age = int(input("Enter patient age: "))
-            query = "INSERT INTO patients(id, name, age) VALUES (%s, %s, %s)"
+            query = "INSERT INTO patients(patient_id, name, age) VALUES (%s, %s, %s)"
             values = (patient_id, name, age)
-            execute_query(query, values, fetch=False)
+            self.execute_query(query, values, fetch=False)
         
-        elif role in ["pharmacist", "other"]:
+        elif role in ["PH", "O"]:
             employee_id = input("Enter employee ID: ")
             name = input("Enter employee name: ")
             salary = float(input("Enter employee salary: "))
             query = "INSERT INTO employees(id, name, role, salary) VALUES (%s, %s, %s, %s)"
             values = (employee_id, name, role, salary)
-            execute_query(query, values, fetch=False)
+            self.execute_query(query, values, fetch=False)
 
         print(f"{role.capitalize()} added successfully!")
 
@@ -53,7 +53,7 @@ class AdminModule:
         query = "UPDATE patients SET assigned_doctor_id = %s WHERE id = %s"
         self.execute_query(query, (doctor_id, patient_id), fetch=False)
 
-    def increment_salary(role, employee_id):
+    def increment_salary(self,role, employee_id):
         new_salary = float(input("Enter new salary: "))
     
         if role == "doctor":
@@ -62,7 +62,7 @@ class AdminModule:
             query = "UPDATE employees SET salary = %s WHERE id = %s"
     
         values = (new_salary, employee_id)
-        execute_query(query, values, fetch=False)
+        self.execute_query(query, values, fetch=False)
 
         print(f"Salary for {role} with ID {employee_id} updated to {new_salary}")
 
@@ -100,7 +100,7 @@ class AdminModule:
             choice = input("Select an option: ")
 
             if choice == "1":
-                role = input("Enter role (doctor/pharmacist/patient/other): ")
+                role = input("Enter role (D/PH/PT/O): ")
                 self.add_employee(role)
             elif choice == "2":
                 patient_id = int(input("Enter patient ID: "))

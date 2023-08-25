@@ -32,6 +32,10 @@ def fetch_id(username):
     cursor=db.cursor()
     query=f"SELECT user_id FROM login_info where username='{username}'"
     cursor.execute(query)
+    result = cursor.fetchone()
+    cursor.close()
+    db.close()
+    return result[0] if result else None
 def main():
     
     while True:
@@ -49,6 +53,7 @@ def main():
             admin_module.admin_module()
         elif user_role == 'D':
             doctor_id = fetch_id(username)
+            print(doctor_id)
             doctor_module = DoctorModule(config, doctor_id)
             doctor_module.doctor_module()
         elif user_role == 'PT':

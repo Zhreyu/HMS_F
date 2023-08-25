@@ -23,7 +23,9 @@ class DoctorModule:
         return result
 
     def view_assigned_patients(self):
-        query = "SELECT user_id FROM doctors WHERE user_id = %s"
+        query = 'SELECT p.patient_id, p.name AS patient_name, p.age, d.id AS doctor_id, d.name AS doctor_name FROM patients p JOIN doctors d ON p.assigned_doctor_id = d.id WHERE d.id = %s;'
+        print(self.doctor_id)
+        print(self.execute_query(query, (self.doctor_id,)))
         return self.execute_query(query, (self.doctor_id,))
 
     def manage_prescriptions(self, patient_id, medicine, dosage):
@@ -33,7 +35,9 @@ class DoctorModule:
     def view_doctor_schedule(self):
         query = "SELECT * FROM appointments WHERE doctor_id = %s"
         #query = "SELECT * FROM doctor_schedule WHERE doctor_id = %s"
-        return self.execute_query(query, (self.doctor_id,))
+        k= self.execute_query(query, (self.doctor_id,))
+        print(k)
+        return k
 
     def apply_for_leave(self, start_date, end_date):
         query = "INSERT INTO leave_requests (user_id, start_date, end_date, status) VALUES (%s, %s, %s, 'pending')"

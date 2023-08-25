@@ -70,16 +70,16 @@ class AdminModule:
 
 
     def assign_doctor_to_patient(self, patient_id, doctor_id):
-        query = "UPDATE patients SET assigned_doctor_id = %s WHERE id = %s"
+        query = "UPDATE patients SET assigned_doctor_id = %s WHERE patient_id = %s"
         self.execute_query(query, (doctor_id, patient_id), fetch=False)
 
     def increment_salary(self,role, employee_id):
         new_salary = float(input("Enter new salary: "))
     
         if role == "doctor":
-            query = "UPDATE doctors SET salary = %s WHERE id = %s"
+            query = "UPDATE doctors SET salary = %s WHERE doctor_id = %s"
         else:  # assuming roles other than doctor are stored in the employees table
-            query = "UPDATE employees SET salary = %s WHERE id = %s"
+            query = "UPDATE employees SET salary = %s WHERE employee_id = %s"
     
         values = (new_salary, employee_id)
         self.execute_query(query, values, fetch=False)

@@ -47,10 +47,12 @@ class PatientModule:
 
     def make_appointment(self, patient_id, doctor_id, date):
         query = """
-        INSERT INTO doctor_schedule (doctor_id, day, start_time, end_time, appointment_approved) 
-        VALUES (%s, DAYNAME(%s), '09:00:00', '10:00:00', 0)
+        INSERT INTO appointments (doctor_id, patient_id, appointment_date, start_time, end_time, status) 
+        VALUES (%s, %s, %s, '09:00:00', '10:00:00', 'pending')
         """
-        self.execute_query(query, (doctor_id, date), fetch=False)
+        values = (doctor_id, patient_id, date)
+
+        self.execute_query(query,values, fetch=False)
 
     def patient_module(self, patient_id):
         print("Welcome Patient!")

@@ -31,7 +31,8 @@ class DoctorModule:
         self.execute_query(query, (patient_id, self.doctor_id, medicine, dosage), fetch=False)
 
     def view_doctor_schedule(self):
-        query = "SELECT * FROM doctor_schedule WHERE doctor_id = %s"
+        query = "SELECT * FROM appointments WHERE doctor_id = %s"
+        #query = "SELECT * FROM doctor_schedule WHERE doctor_id = %s"
         return self.execute_query(query, (self.doctor_id,))
 
     def apply_for_leave(self, start_date, end_date):
@@ -52,7 +53,8 @@ class DoctorModule:
         self.execute_query(query, (self.doctor_id, day, start_time, end_time, start_time, end_time), fetch=False)
 
     def approve_appointment(self):
-        query = "SELECT * FROM doctor_schedule WHERE doctor_id = %s AND appointment_approved = 0"
+        query = "SELECT * FROM appointments WHERE doctor_id = %s AND status = 'pending'"
+
         appointments = self.execute_query(query, (self.doctor_id,))
 
         if not appointments:
@@ -67,7 +69,7 @@ class DoctorModule:
 
         if 1 <= choice <= len(appointments):
             app_id = appointments[choice - 1]['id']
-            query = "UPDATE doctor_schedule SET appointment_approved = 1 WHERE id = %s"
+            query = "UPDATE appointments SET status = 'approved' WHERE appointment_id = %s"
             self.execute_query(query, (app_id,), fetch=False)
             print("Appointment approved.")
         else:

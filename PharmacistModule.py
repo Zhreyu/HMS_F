@@ -18,10 +18,10 @@ class PharmacistModule:
             print(f"Error: {err}")
             return None
 
-    def view_inventory():
+    def view_inventory(self):
         try:
-            cursor.execute("SELECT * FROM pharmacy")
-            inventory = cursor.fetchall()
+            self.cursor.execute("SELECT * FROM pharmacy")
+            inventory = self.cursor.fetchall()
             if not inventory:
                 print("Inventory is empty.")
                 return
@@ -32,7 +32,7 @@ class PharmacistModule:
         except Exception as e:
             print("An error occurred:", e)
 
-    def update_inventory():
+    def update_inventory(self):
         medicine_id = input("Enter medicine ID (or 'new' if it's a new medicine): ")
         
         if medicine_id == 'new':
@@ -41,8 +41,8 @@ class PharmacistModule:
             price = float(input("Enter price: "))
             try:
                 query = "INSERT INTO pharmacy (name, quantity, price) VALUES (%s, %s, %s)"
-                cursor.execute(query, (medicine_name, quantity, price))
-                db.commit()
+                self.cursor.execute(query, (medicine_name, quantity, price))
+                self.db.commit()
                 print("New medicine added to inventory.")
             except Exception as e:
                 print("An error occurred:", e)
@@ -68,8 +68,8 @@ class PharmacistModule:
                 try:
                     query = f"UPDATE pharmacy SET {', '.join(query_parts)} WHERE id = %s"
                     values.append(medicine_id)
-                    cursor.execute(query, values)
-                    db.commit()
+                    self.cursor.execute(query, values)
+                    self.db.commit()
                     print("Medicine inventory updated successfully.")
                 except Exception as e:
                     print("An error occurred:", e)
@@ -77,11 +77,11 @@ class PharmacistModule:
                 print("No updates provided.")
 
     
-    def view_salary_info(user_id):
+    def view_salary_info(self,user_id):
         try:
             query = "SELECT salary FROM employees WHERE id = %s"
-            cursor.execute(query, (user_id,))
-            salary = cursor.fetchone()
+            self.cursor.execute(query, (user_id,))
+            salary = self.cursor.fetchone()
             if salary:
                 print(f"Your salary: {salary[0]}")
             else:

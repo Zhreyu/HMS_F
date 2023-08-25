@@ -5,6 +5,7 @@ class AdminModule:
         self.db = mysql.connector.connect(**config)
         self.cursor = self.db.cursor()
 
+   
     def execute_query(self, query, values=None, fetch=True):
         try:
             if values:
@@ -18,33 +19,52 @@ class AdminModule:
         except mysql.connector.Error as err:
             print(f"Error: {err}")
             return None
-
-    def add_employee(self,role):
+    def add_employee(self, role):
         if role == "D":
-            doctor_id = input("Enter Doctor ID: ")
             name = input("Enter Doctor name: ")
             specialty = input("Enter specialty: ")
             salary = float(input("Enter Doctor salary: "))
             leave_balance = 5
-            query = "INSERT INTO doctors(id, name, specialty, salary, leave_balance) VALUES (%s, %s, %s, %s, %s)"
-            values = (doctor_id, name, specialty, salary, leave_balance)
+            query = "INSERT INTO doctors(name, specialty, salary, leave_balance) VALUES (%s, %s, %s, %s)"
+            values = (name, specialty, salary, leave_balance)
             self.execute_query(query, values, fetch=False)
-        
+            doctor_id = self.cursor.lastrowid  # This fetches the last inserted ID
+            
         elif role == "PT":
-            patient_id = input("Enter patient ID: ")
             name = input("Enter patient name: ")
             age = int(input("Enter patient age: "))
-            query = "INSERT INTO patients(patient_id, name, age) VALUES (%s, %s, %s)"
-            values = (patient_id, name, age)
+            query = "INSERT INTO patients(name, age) VALUES (%s, %s)"
+            values = (name, age)
             self.execute_query(query, values, fetch=False)
+            patient_id = self.cursor.lastrowid  # This fetches the last inserted ID
         
         elif role in ["PH", "O"]:
-            employee_id = input("Enter employee ID: ")
             name = input("Enter employee name: ")
             salary = float(input("Enter employee salary: "))
-            query = "INSERT INTO employees(id, name, role, salary) VALUES (%s, %s, %s, %s)"
-            values = (employee_id, name, role, salary)
+            query = "INSERT INTO employees(name, role, salary) VALUES (%s, %s, %s)"
+            values = (name, role, salary)
             self.execute_query(query, values, fetch=False)
+            employee_id = self.cursor.lastrowid  # This fetches the last inserted ID
+
+        # Generate simple credentials
+        if role == "D":
+            user_id = doctor_id
+        elif role == "PT":
+            user_id = patient_id
+        else:
+            user_id = employee_id
+        
+        username = name.lower() + role
+        password = "password123"
+
+        # Store the credentials in the login_info table
+        query = "INSERT INTO login_info (user_id, username, password, role) VALUES (%s, %s, %s, %s)"
+        values = (user_id, username, password, role)
+        self.execute_query(query, values, fetch=False)
+
+        # Provide the credentials to the user
+        print(f"Username: {username}")
+        print(f"Password: {password}")
 
         print(f"{role.capitalize()} added successfully!")
 
@@ -80,7 +100,7 @@ class AdminModule:
         return self.execute_query(query)
 
     def view_all_other_employees(self):
-        query = "SELECT * FROM employees WHERE role = 'other'"
+        query = "SELECT * FROM employees WHERE role = 'PH' OR 'O'"
         return self.execute_query(query)
 
     def admin_module(self):
